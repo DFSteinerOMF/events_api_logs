@@ -8,12 +8,12 @@ import java.util.Date;
 public class Log {
 
     private long id;
-    private Date date;
+    private String date;
     private String description;
     private String severity;
     private String module;
 
-    public Log(long id, Date date, String description, String severity, String module) {
+    public Log(long id, String date, String description, String severity, String module) {
         this.id = id;
         this.date = date;
         this.description = description;
@@ -29,11 +29,11 @@ public class Log {
         this.id = id;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 

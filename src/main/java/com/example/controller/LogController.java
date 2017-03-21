@@ -19,6 +19,6 @@ public class LogController {
 
     @RequestMapping
     public Log log(@RequestParam(value = "name", defaultValue = "World") String name){
-        return new Log(counter.incrementAndGet(), new Date(), "DESC", "SEVERITY", name);
+        return new Log(counter.incrementAndGet(), new Date().toString(), "DESC", "SEVERITY", name);
     }
 }
