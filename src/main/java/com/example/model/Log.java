@@ -1,31 +1,30 @@
 package com.example.model;
 
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 /**
  * Created by Dominik on 21.03.2017.
  */
+@JsonAutoDetect
 public class Log {
 
-    private long id;
+    private int id;
     private String date;
     private String description;
-    private String severity;
     private String module;
 
-    public Log(long id, String date, String description, String severity, String module) {
+    public Log(int id, String date, String description, String module) {
         this.id = id;
         this.date = date;
         this.description = description;
-        this.severity = severity;
         this.module = module;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -43,14 +42,6 @@ public class Log {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getSeverity() {
-        return severity;
-    }
-
-    public void setSeverity(String severity) {
-        this.severity = severity;
     }
 
     public String getModule() {
