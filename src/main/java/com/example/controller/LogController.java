@@ -80,11 +80,11 @@ public class LogController {
                     + ", '" + logD.getModule() + "'"
                     +", '" + logD.getDate() + "')";
             ResultSet rs = statement.executeQuery(sql);
+            return ResponseEntity.status(HttpStatus.OK).body(logD);
         } catch (SQLException e) {
             return ResponseEntity.status(e.getErrorCode()).body(e.getMessage());
         } catch (URISyntaxException e) {
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.OK).body(logD);
     }
 }
