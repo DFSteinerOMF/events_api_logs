@@ -68,6 +68,7 @@ public class LogController {
         return "showLogs";
     }
 
+    //poprawic by errory wypisywaly 
     @RequestMapping(value = "/addLog", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createNewLog(@RequestBody String log) throws IOException{
         Log logD = MAPPER.readValue(log,Log.class);
@@ -80,11 +81,11 @@ public class LogController {
                     + ", '" + logD.getModule() + "'"
                     +", '" + logD.getDate() + "')";
             ResultSet rs = statement.executeQuery(sql);
-            return ResponseEntity.status(HttpStatus.OK).body(logD);
         } catch (SQLException e) {
-            return ResponseEntity.status(e.getErrorCode()).body(e.getMessage());
+            e.printStackTrace();
         } catch (URISyntaxException e) {
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage());
+            e.printStackTrace();
         }
+        return ResponseEntity.status(HttpStatus.OK).body(logD);
     }
 }
