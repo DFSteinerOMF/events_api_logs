@@ -28,46 +28,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@SpringBootApplication
 @RequestMapping("api/logs")
 public class LogController {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @ApiOperation(value = "Get all logs", notes = "Get all logs from db", nickname = "get_all_logs")
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = 200,
-                    message = "Success",
-                    response = List.class)
-    })
+            @ApiResponse(code = 200, message = "Success", response = List.class)})
     @ApiImplicitParams({
-            @ApiImplicitParam(
-                    name = "sort_type",
-                    value = "Sort type module/date/description",
-                    required = true,
-                    dataType = "string",
-                    paramType = "path",
-                    defaultValue = "null")
+            @ApiImplicitParam(name = "sort_type", value = "Sort type module/date/description", required = true, dataType = "string", paramType = "path", defaultValue = "null")
     })
     @RequestMapping(value = "/showAllLogs/{sort_type}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> showAllLogs(Model model,
-                                         @PathVariable("sort_type") String sort_type) throws JsonProcessingException {
-        List logs = new ArrayList<>();
+    public ResponseEntity<?> showAllLogs(@PathVariable("sort_type") String sort_type) throws JsonProcessingException {
+        List<Log> logs = new ArrayList<>();
         try{
             Connection connection = DatabaseConnection.getConnection();
             Statement statement = connection.createStatement();
-            String sql = "SELECT * FROM log";
+            String sql = "SELECT * FROM log ORDER BY "+sort_type;
             ResultSet resultSet = statement.executeQuery(sql);
             StringBuffer stringBuffer = new StringBuffer();
 
             while (resultSet.next()){
-                int id = resultSet.getInt("ID");
-                String description = resultSet.getString("description");
-                String module = resultSet.getString("module_name");
-                String date = resultSet.getString("date");
-                logs.add(new Log(id,description,module,date));
+                logs.add(new Log().getObjectFromSQL(resultSet));
             }
-            model.addAttribute("logs", logs);
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (URISyntaxException e) {
@@ -88,20 +71,20 @@ public class LogController {
     @RequestMapping(value = "/addLog", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createNewLog(@RequestBody String log) throws IOException{
         Log logD = MAPPER.readValue(log,Log.class);
-            try {
-                Connection connection = DatabaseConnection.getConnection();
-                Statement statement = connection.createStatement();
-                String sql;
-                sql = "insert into log values " +
-                        "(DEFAULT, '" + logD.getDescription() + "'"
-                        + ", '" + logD.getModule() + "'"
-                        +", '" + logD.getDate() + "')";
-                ResultSet rs = statement.executeQuery(sql);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
-            return ResponseEntity.status(HttpStatus.OK).body(log);
+        try {
+            Connection connection = DatabaseConnection.getConnection();
+            Statement statement = connection.createStatement();
+            String sql;
+            sql = "insert into log values " +
+                    "(DEFAULT, '" + logD.getDescription() + "'"
+                    + ", '" + logD.getModule() + "'"
+                    +", '" + logD.getDate() + "')";
+            ResultSet rs = statement.executeQuery(sql);
+        } catch (SQLException e) {
+            return ResponseEntity.status(e.getErrorCode()).body(e.getMessage());
+        } catch (URISyntaxException e) {
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage());
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(log);
     }
 }
