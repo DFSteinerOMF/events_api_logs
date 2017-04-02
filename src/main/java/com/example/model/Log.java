@@ -1,11 +1,14 @@
 package com.example.model;
 
+import com.example.LogDeserializer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * Created by Dominik on 21.03.2017.
  */
 @JsonAutoDetect
+@JsonDeserialize(using = LogDeserializer.class)
 public class Log {
 
     private int id;

@@ -17,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.spring.web.json.Json;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.*;
@@ -83,15 +85,16 @@ public class LogController {
     }
 
     @RequestMapping(value = "/addLog", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createNewLog(@RequestBody Log log){
+    public ResponseEntity<?> createNewLog(@RequestBody String log) throws IOException{
+        Log logD = MAPPER.readValue(log,Log.class);
             try {
                 Connection connection = getConnection();
                 Statement statement = connection.createStatement();
                 String sql;
                 sql = "insert into log values " +
-                        "(DEFAULT, '" + log.getDescription() + "'"
-                        + ", '" + log.getModule() + "'"
-                        +", '" + log.getDate() + "')";
+                        "(DEFAULT, '" + logD.getDescription() + "'"
+                        + ", '" + logD.getModule() + "'"
+                        +", '" + logD.getDate() + "')";
                 ResultSet rs = statement.executeQuery(sql);
             } catch (SQLException e) {
                 e.printStackTrace();
