@@ -85,6 +85,6 @@ public class LogController {
         } catch (URISyntaxException e) {
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.OK).body(log);
+        return ResponseEntity.status(HttpStatus.OK).body(logD);
     }
 }
