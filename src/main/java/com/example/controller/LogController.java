@@ -4,6 +4,7 @@ package com.example.controller;
  * Created by Dominik on 21.03.2017.
  */
 
+import com.example.DatabaseConnection;
 import com.example.model.Log;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -53,7 +54,7 @@ public class LogController {
                                          @PathVariable("sort_type") String sort_type) throws JsonProcessingException {
         List logs = new ArrayList<>();
         try{
-            Connection connection = getConnection();
+            Connection connection = DatabaseConnection.getConnection();
             Statement statement = connection.createStatement();
             String sql = "SELECT * FROM log";
             ResultSet resultSet = statement.executeQuery(sql);
@@ -88,7 +89,7 @@ public class LogController {
     public ResponseEntity<?> createNewLog(@RequestBody String log) throws IOException{
         Log logD = MAPPER.readValue(log,Log.class);
             try {
-                Connection connection = getConnection();
+                Connection connection = DatabaseConnection.getConnection();
                 Statement statement = connection.createStatement();
                 String sql;
                 sql = "insert into log values " +
@@ -103,22 +104,4 @@ public class LogController {
             }
             return ResponseEntity.status(HttpStatus.OK).body(log);
     }
-
-    private static Connection getConnection() throws URISyntaxException, SQLException {
-        URI dbUri = new URI(System.getenv("DATABASE_URL"));
-
-        String username = dbUri.getUserInfo().split(":")[0];
-        String password = dbUri.getUserInfo().split(":")[1];
-        String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':'
-                + dbUri.getPort() + dbUri.getPath()
-                + "?sslmode=require";
-
-        return DriverManager.getConnection(dbUrl, username, password);
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(
-                LogController.class, args);
-    }
-
 }
