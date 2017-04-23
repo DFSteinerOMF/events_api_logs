@@ -3,20 +3,31 @@ package com.example.model;
 import com.example.LogDeserializer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 /**
  * Created by Dominik on 21.03.2017.
  */
 @JsonAutoDetect
 @JsonDeserialize(using = LogDeserializer.class)
+@Entity
 public class Log {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @NotEmpty
     private String date;
+    @NotEmpty
     private String description;
+    @NotEmpty
     private String module;
 
     public Log(){
