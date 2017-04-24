@@ -60,7 +60,7 @@ public class LogController {
         final String token = bearerAuthorization.substring(7);
         try {
             Jwts.parser()
-                    .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(dbKey)))
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(blKey)))
                     .parseClaimsJws(token);
             //OK, we can trust this JWT
             List<Log> logs = logRepository.findAll();
