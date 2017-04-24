@@ -52,13 +52,39 @@ public class LogController {
             @ApiImplicitParam(name = "sort_type", value = "Sort type module/date/description", required = true, dataType = "string", paramType = "path", defaultValue = "null")
     })
     @RequestMapping(value = "/showAllLogs/{sort_type}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> showAllLogs(@PathVariable("sort_type") String sort_type) throws JsonProcessingException {
-
-        List<Log> logs = logRepository.findAll();
-        sortLogList(logs, sort_type);
-        return ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(MAPPER.writeValueAsString(logs));
+    public ResponseEntity<?> showAllLogs(@RequestHeader("Authorization") String bearerAuthorization, @PathVariable("sort_type") String sort_type) throws JsonProcessingException {
+        if (bearerAuthorization == null || !bearerAuthorization.startsWith("Bearer ")) {
+            //throw new SignatureException(bearerAuthorization);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("FORBIDDEN, NO BEARER");
+        }
+        final String token = bearerAuthorization.substring(7);
+        try {
+            Jwts.parser()
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(dbKey)))
+                    .parseClaimsJws(token);
+            //OK, we can trust this JWT
+            List<Log> logs = logRepository.findAll();
+            sortLogList(logs, sort_type);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(MAPPER.writeValueAsString(logs));
+        } catch (SignatureException e) {
+            //don't trust the JWT!
+        }
+        try {
+            Jwts.parser()
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(dbKey)))
+                    .parseClaimsJws(token);
+            //OK, we can trust this JWT
+            List<Log> logs = logRepository.findAll();
+            sortLogList(logs, sort_type);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(MAPPER.writeValueAsString(logs));
+        } catch (SignatureException e) {
+            //don't trust the JWT!
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("FORBIDDEN");
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -95,7 +121,7 @@ public class LogController {
         }
         try {
             Jwts.parser()
-                    .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(dbKey)))
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(blKey)))
                     .parseClaimsJws(token);
             //OK, we can trust this JWT
             logRepository.save(log);
