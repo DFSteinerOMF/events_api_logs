@@ -1,8 +1,7 @@
 package com.example;
 
-import com.example.model.Log;
+import com.example.model.Audit;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -11,18 +10,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 
 /**
- * Created by Szymon on 02.04.2017.
+ * Created by Dominik on 31.05.2017.
  */
-public class LogDeserializer extends JsonDeserializer<Log> {
+public class AuditDeserializer extends JsonDeserializer<Audit> {
 
     @Override
-    public Log deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+    public Audit deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         ObjectCodec oc = jsonParser.getCodec();
         JsonNode node = oc.readTree(jsonParser);
-        return new Log(0,
+        return new Audit(0,
                 node.get("date").textValue(),
-                node.get("description").textValue(),
                 node.get("module").textValue(),
-                node.get("severity").textValue());
+                node.get("userAction").textValue(),
+                node.get("description").textValue());
     }
 }

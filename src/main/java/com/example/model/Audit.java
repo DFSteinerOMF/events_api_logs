@@ -1,57 +1,55 @@
 package com.example.model;
 
-import com.example.LogDeserializer;
+import com.example.AuditDeserializer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.persistence.*;
 
 /**
- * Created by Dominik on 21.03.2017.
+ * Created by Dominik on 10.05.2017.
  */
 @JsonAutoDetect
-@JsonDeserialize(using = LogDeserializer.class)
+@JsonDeserialize(using = AuditDeserializer.class)
 @Entity
-@Table(name = "logs")
-public class Log {
+public class Audit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    int id;
 
     @NotEmpty
-    private String date;
+    String date;
 
     @NotEmpty
-    private String description;
+    String module;
 
     @NotEmpty
-    private String module;
+    String userAction;
 
     @NotEmpty
-    private  String severity;
+    String description;
 
-    public Log(){
-
-    }
-
-    public Log(int id, String date, String description, String module, String severity) {
-        this.id = id;
+    public Audit(int id, String date, String module, String userAction, String description){
         this.date = date;
-        this.description = description;
         this.module = module;
-        this.severity = severity;
+        this.userAction = userAction;
+        this.description = description;
     }
 
-    public Log getObjectFromSQL(ResultSet resultSQL) throws SQLException{
+    public Audit getObjectFromSQL(ResultSet resultSQL) throws SQLException{
         int id = resultSQL.getInt("ID");
         String description = resultSQL.getString("description");
         String module = resultSQL.getString("module_name");
         String date = resultSQL.getString("date");
-        return new Log(id,description,module,date,severity);
+        String userAction = resultSQL.getString("userAction");
+        return new Audit(id, date, module, userAction, description);
     }
 
     public int getId() {
@@ -70,14 +68,6 @@ public class Log {
         this.date = date;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getModule() {
         return module;
     }
@@ -86,11 +76,19 @@ public class Log {
         this.module = module;
     }
 
-    public String getSeverity() {
-        return severity;
+    public String getUserAction() {
+        return userAction;
     }
 
-    public void setSeverity(String severity) {
-        this.severity = severity;
+    public void setUserAction(String userAction) {
+        this.userAction = userAction;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

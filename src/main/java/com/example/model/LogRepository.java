@@ -10,7 +10,11 @@ import java.util.List;
  */
 @Repository
 public interface LogRepository extends JpaRepository<Log,Integer> {
-    public Log findById(int id);
+    Log findById(int id);
 
-    public List<Log> findByDescriptionContainsOrModuleContainsOrDateContains(String descriptionPart, String module, String date);
+    List<Log> findAllByModule(String module);
+
+    List<Log> findAllBySeverity(String severity);
+
+    List<Log> findAllByModuleAndSeverity(String module, String severity);
 }
