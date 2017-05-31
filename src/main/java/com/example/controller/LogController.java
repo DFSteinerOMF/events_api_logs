@@ -86,31 +86,101 @@ public class LogController {
     }
 
     @RequestMapping(
-            value = {"/showLogs/module/[module]/[sort_type]/",
-                            "/showLogs/severity/[severity]/[sort_type]/",
-                            "/showLogs/[module]/[severity]/[sort_type]/"},
+            value = "/showLogs/module/{module_name}/{sort_type}/",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> showAllLogsWithGivenModuleAndSeverity(@RequestHeader("Authorization") String bearerAuthorization,
-                                                                   @PathVariable("sort_type") String sort_type,
-                                                                   @PathVariable("module") Optional<String> module,
-                                                                   @PathVariable("severity") Optional<String> severity) throws JsonProcessingException {
+    public ResponseEntity<?> showLogsWithGivenModule(@RequestHeader("Authorization") String bearerAuthorization,
+                                                                   @PathVariable(value = "module_name") String module,
+                                                                   @PathVariable(value = "sort_type") String sort_type) throws JsonProcessingException {
         if (!checkIfBearerIsOk(bearerAuthorization)) {
             //throw new SignatureException(bearerAuthorization);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("FORBIDDEN, NO BEARER");
         }
         final String token = bearerAuthorization.substring(7);
         List<Log> logs;
-        if(module.isPresent() && severity.isPresent()){
-            logs = logRepository.findAllByModule(module.get());
-            //logs = logRepository.findAllByModuleAAndSeverity(module.get(), severity.get());
+        logs = logRepository.findAllByModule(module);
+        sortLogList(logs, sort_type);
+        try {
+            Jwts.parser()
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(blKey)))
+                    .parseClaimsJws(token);
+            //OK, we can trust this JWT
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(MAPPER.writeValueAsString(logs));
+        } catch (SignatureException e) {
+            //don't trust the JWT!
         }
-        else if(module.isPresent()){
-            logs = logRepository.findAllByModule(module.get());
+        try {
+            Jwts.parser()
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(dbKey)))
+                    .parseClaimsJws(token);
+            //OK, we can trust this JWT
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(MAPPER.writeValueAsString(logs));
+        } catch (SignatureException e) {
+            //don't trust the JWT!
         }
-        else{
-            logs = logRepository.findAllBySeverity(severity.get());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("FORBIDDEN");
+    }
+
+    @RequestMapping(
+            value = "/showLogs/{module_name}/{severity_name}/{sort_type}/",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> showLogsWithGivenSeverity(@RequestHeader("Authorization") String bearerAuthorization,
+                                                       @PathVariable(value = "module_name") String module,
+                                                       @PathVariable(value = "severity_name") String severity,
+                                                       @PathVariable(value = "sort_type") String sort_type) throws JsonProcessingException {
+        if (!checkIfBearerIsOk(bearerAuthorization)) {
+            //throw new SignatureException(bearerAuthorization);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("FORBIDDEN, NO BEARER");
         }
+        final String token = bearerAuthorization.substring(7);
+        List<Log> logs;
+        logs = logRepository.findAllByModuleAndSeverity(module,severity);
+        sortLogList(logs, sort_type);
+        try {
+            Jwts.parser()
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(blKey)))
+                    .parseClaimsJws(token);
+            //OK, we can trust this JWT
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(MAPPER.writeValueAsString(logs));
+        } catch (SignatureException e) {
+            //don't trust the JWT!
+        }
+        try {
+            Jwts.parser()
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(dbKey)))
+                    .parseClaimsJws(token);
+            //OK, we can trust this JWT
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(MAPPER.writeValueAsString(logs));
+        } catch (SignatureException e) {
+            //don't trust the JWT!
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("FORBIDDEN");
+    }
+
+    @RequestMapping(
+            value = "/showLogs/severity_name/{severity_name}/{sort_type}/",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> showLogsWithGivenModuleAndSeverity(@RequestHeader("Authorization") String bearerAuthorization,
+                                                       @PathVariable(value = "severity_name") String severity,
+                                                       @PathVariable(value = "sort_type") String sort_type) throws JsonProcessingException {
+        if (!checkIfBearerIsOk(bearerAuthorization)) {
+            //throw new SignatureException(bearerAuthorization);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("FORBIDDEN, NO BEARER");
+        }
+        final String token = bearerAuthorization.substring(7);
+        List<Log> logs;
+        logs = logRepository.findAllBySeverity(severity);
+        sortLogList(logs, sort_type);
         try {
             Jwts.parser()
                     .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(blKey)))

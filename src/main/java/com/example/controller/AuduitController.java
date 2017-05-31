@@ -61,6 +61,47 @@ public class AuduitController {
         }
         try {
             Jwts.parser()
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(dbKey)))
+                    .parseClaimsJws(token);
+            //OK, we can trust this JWT
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(MAPPER.writeValueAsString(auditList));
+        } catch (SignatureException e) {
+            //don't trust the JWT!
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("FORBIDDEN");
+    }
+
+    @RequestMapping(
+            value =
+                    "/showAudits/module/[module_name]/[sort_type]/",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?>showAllAuditsWithGivenModule(@RequestHeader("Authorization") String bearerAuthorization,
+                                                                      @PathVariable("sort_type") String sort_type,
+                                                                      @PathVariable("module_name") String module) throws JsonProcessingException {
+        if (!checkIfBearerIsOk(bearerAuthorization)) {
+            //throw new SignatureException(bearerAuthorization);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("FORBIDDEN, NO BEARER");
+        }
+        final String token = bearerAuthorization.substring(7);
+        List<Audit> auditList;
+        auditList = auditRepository.findAllByModule(module);
+        sortAuditList(auditList, sort_type);
+        try {
+            Jwts.parser()
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(dbKey)))
+                    .parseClaimsJws(token);
+            //OK, we can trust this JWT
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(MAPPER.writeValueAsString(auditList));
+        } catch (SignatureException e) {
+            //don't trust the JWT!
+        }
+        try {
+            Jwts.parser()
                     .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(blKey)))
                     .parseClaimsJws(token);
             //OK, we can trust this JWT
@@ -75,34 +116,65 @@ public class AuduitController {
 
     @RequestMapping(
             value =
-            {"/showAudits/module/[module]/[sort_type]/",
-            "/showAudits/user_action/[user_action]/[sort_type]/",
-            "/showAudits/[module]/[user_action]/[sort_type]/"},
+                    "/showAudits/user_action/[user_action_name]/[sort_type]/",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?>showAllAuditsWithGivenModuleAndUserAction(@RequestHeader("Authorization") String bearerAuthorization,
+    public ResponseEntity<?>showAllAuditsWithGivenUserAction(@RequestHeader("Authorization") String bearerAuthorization,
                                                                       @PathVariable("sort_type") String sort_type,
-                                                                      @PathVariable("module") Optional<String> module,
-                                                                      @PathVariable("user_action") Optional<String> userAction) throws JsonProcessingException {
+                                                                      @PathVariable("user_action_name") String userAction) throws JsonProcessingException {
         if (!checkIfBearerIsOk(bearerAuthorization)) {
             //throw new SignatureException(bearerAuthorization);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("FORBIDDEN, NO BEARER");
         }
         final String token = bearerAuthorization.substring(7);
         List<Audit> auditList;
-        if(module.isPresent() && userAction.isPresent()){
-            auditList = auditRepository.findAllByModuleAndUserAction(module.get(), userAction.get());
-        }
-        else if(module.isPresent()) {
-            auditList = auditRepository.findAllByModule(module.get());
-        }
-        else{
-            auditList = auditRepository.findAllByUserAction(userAction.get());
-        }
+        auditList = auditRepository.findAllByUserAction(userAction);
         sortAuditList(auditList, sort_type);
         try {
             Jwts.parser()
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(dbKey)))
+                    .parseClaimsJws(token);
+            //OK, we can trust this JWT
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(MAPPER.writeValueAsString(auditList));
+        } catch (SignatureException e) {
+            //don't trust the JWT!
+        }
+        try {
+            Jwts.parser()
                     .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(blKey)))
+                    .parseClaimsJws(token);
+            //OK, we can trust this JWT
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(MAPPER.writeValueAsString(auditList));
+        } catch (SignatureException e) {
+            //don't trust the JWT!
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("FORBIDDEN");
+    }
+
+    @RequestMapping(
+            value =
+                    "/showAudits/{module_name}/{user_action_name}/{sort_type}/",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?>showAllAuditsWithGivenModuleAndUserAction(@RequestHeader("Authorization") String bearerAuthorization,
+                                                             @PathVariable("sort_type") String sort_type,
+                                                             @PathVariable("module_name") String module,
+                                                             @PathVariable("user_action_name") String userAction) throws JsonProcessingException {
+        if (!checkIfBearerIsOk(bearerAuthorization)) {
+            //throw new SignatureException(bearerAuthorization);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("FORBIDDEN, NO BEARER");
+        }
+        final String token = bearerAuthorization.substring(7);
+        List<Audit> auditList;
+        auditList = auditRepository.findAllByModuleAndUserAction(module, userAction);
+        sortAuditList(auditList, sort_type);
+        try {
+            Jwts.parser()
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(dbKey)))
                     .parseClaimsJws(token);
             //OK, we can trust this JWT
             return ResponseEntity.status(HttpStatus.OK)
@@ -147,7 +219,7 @@ public class AuduitController {
         }
         try {
             Jwts.parser()
-                    .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(dbKey)))
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(TextCodec.BASE64.encode(blKey)))
                     .parseClaimsJws(token);
             //OK, we can trust this JWT
             auditRepository.save(audit);
