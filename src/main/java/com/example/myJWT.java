@@ -1,13 +1,12 @@
 package com.example;
+
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.TextCodec;
-import io.jsonwebtoken.impl.crypto.JwtSignatureValidator;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
-import java.security.SignatureException;
 import java.util.Date;
 
 /**

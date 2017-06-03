@@ -4,9 +4,9 @@ package com.example.controller;
  * Created by Dominik on 21.03.2017.
  */
 
-import com.example.DatabaseConnection;
 import com.example.model.Log;
 import com.example.model.LogRepository;
+import com.example.myJWT;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
@@ -15,20 +15,14 @@ import io.jsonwebtoken.impl.TextCodec;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
+import javax.xml.bind.DatatypeConverter;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-
-import com.example.myJWT;
-
-import javax.xml.bind.DatatypeConverter;
 
 @RestController
 @RequestMapping("api/logs")

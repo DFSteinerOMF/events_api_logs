@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.xml.bind.DatatypeConverter;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by Dominik on 10.05.2017.

@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.persistence.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.persistence.*;
 
 /**
  * Created by Dominik on 21.03.2017.

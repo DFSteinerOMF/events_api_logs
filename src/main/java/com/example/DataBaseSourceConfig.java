@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
-import java.util.logging.Logger;
 
 /**
  * Created by Dominik on 23.04.2017.
