@@ -38,7 +38,7 @@ public class AuduitController {
         this.auditRepository = auditRepository;
     }
 
-    @RequestMapping(value = "/showAllAudits/[sort_type]", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/showAllAudits/{sort_type}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> showAllAudits(@RequestHeader("Authorization") String bearerAuthorization,
                                            @PathVariable("sort_type") String sort_type) throws JsonProcessingException{
         if (!checkIfBearerIsOk(bearerAuthorization)) {
@@ -75,7 +75,7 @@ public class AuduitController {
 
     @RequestMapping(
             value =
-                    "/showAudits/module/[module_name]/[sort_type]/",
+                    "/showAudits/module/{module_name}/{sort_type}/",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?>showAllAuditsWithGivenModule(@RequestHeader("Authorization") String bearerAuthorization,
@@ -116,7 +116,7 @@ public class AuduitController {
 
     @RequestMapping(
             value =
-                    "/showAudits/user_action/[user_action_name]/[sort_type]/",
+                    "/showAudits/user_action/{user_action_name}/{sort_type}/",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?>showAllAuditsWithGivenUserAction(@RequestHeader("Authorization") String bearerAuthorization,
