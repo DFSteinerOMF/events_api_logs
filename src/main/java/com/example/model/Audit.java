@@ -43,6 +43,10 @@ public class Audit {
         this.description = description;
     }
 
+    public Audit(){
+
+    }
+
     public Audit getObjectFromSQL(ResultSet resultSQL) throws SQLException{
         int id = resultSQL.getInt("ID");
         String description = resultSQL.getString("description");
